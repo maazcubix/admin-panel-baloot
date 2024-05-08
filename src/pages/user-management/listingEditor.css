@@ -1,0 +1,4 @@
+.tdEmailBody .ql-formats button.ql-image , .tdEmailBody .ql-formats button.ql-link ,.tdEmailBody .ql-formats button.ql-code-block ,.tdEmailBody .ql-formats button.ql-clean,.tdEmailBody .ql-formats button.ql-list , .tdEmailBody span.ql-align.ql-picker.ql-icon-picker ,.tdEmailBody span.ql-background.ql-picker.ql-color-picker , .tdEmailBody span.ql-color.ql-picker.ql-color-picker{
+    display: none !important;
+}
+

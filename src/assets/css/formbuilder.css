@@ -1,0 +1,48 @@
+.toolBox {
+  background: #0c1427;
+  padding: 10px;
+}
+.toolBox ul {
+  padding: 0;
+}
+button.tool_item {
+  width: 100%;
+  text-align: left;
+  padding: 9px;
+  display: block;
+  background: transparent;
+  border: none;
+  color: #fff;
+  border-bottom: 1px solid #25314e;
+}
+.toolBox ul li {
+  list-style: none;
+}
+svg {
+  float: left;
+  width: 23px;
+  fill: #fff;
+  transform: scale(0.8);
+}
+.tool_item span {
+  color: #fff;
+  padding-left: 13px;
+  font-size: 15px;
+}
+
+.frame {
+  border: 1px dashed #ddd;
+  min-height: 344px;
+}
+.form_elements {
+  background: #f3f2f2;
+  padding: 11px;
+}
+label.radio_block {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.input_icon {
+  cursor: pointer;
+}
