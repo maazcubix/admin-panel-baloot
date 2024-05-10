@@ -22,7 +22,7 @@ const item = [
 
 const DetailView = () => {
     const toast = useRef(null);
-    const navigate=useNavigate()
+    const navigate=useNavigate();
 
   const [loading, setLoading] = useState(false);
   const [itemType, selectItemType] = useState("");
@@ -30,7 +30,6 @@ const DetailView = () => {
   const [file, setFile] = useState<File | null>(null);
   const [image, setImage] = useState("");
   const [name, setName] = useState("");
-  console.log(itemType);
   
   
   const [GoogleID, setGoogleID] = useState({
@@ -41,7 +40,6 @@ const DetailView = () => {
     id: "",
     priceAED: Number(""),
   });
-  console.log(AppleID);
   
 
   const [price, setPrice] = useState<number | null>(0);
@@ -101,7 +99,6 @@ const showError = (message) => {
     try {
         
       if (file) {
-        console.log("ehllpo");
 
         const form = new FormData();
         form.append("file", file);
@@ -123,7 +120,7 @@ const showError = (message) => {
         const storeResponse = await createStore(payload);
         setLoading(false);
         showSuccess();
-        navigate("/product-management")
+        // navigate("/product-management")
       }
       else {
         setLoading(false)
@@ -132,10 +129,16 @@ const showError = (message) => {
       }
     } catch (error) {
       console.log(error);
-      console.log();
       
-      showError(error.response.data.message)
+      if(error.response.data.msg){
+      showError(error.response.data.msg)
       setLoading(false)
+}
+else{
+  showError(error.response.errors[0]);
+  setLoading(false)
+
+}
     }
   };
 
@@ -273,14 +276,14 @@ const showError = (message) => {
                           </label>
                           <input
                           required
-                            type="text"
+                            type="number"
                             className="form-control caption_input"
                             placeholder="enter address line 1"
-                            value={AppleID.priceInAed}
+                            value={AppleID.priceAED}
                             onChange={(e) =>
                               setAppleID({
                                 ...AppleID,
-                                priceInAed: e.target.value,
+                                priceAED: Number(e.target.value),
                               })
                             }
                           />
@@ -292,7 +295,7 @@ const showError = (message) => {
 
                           <input
                             required
-                            type="text"
+                            type="number"
                             className="form-control caption_input"
                             placeholder="Joining Date"
                             value={GoogleID.id}
@@ -312,11 +315,11 @@ const showError = (message) => {
                             type="text"
                             className="form-control caption_input"
                             placeholder="Joining Date"
-                            value={GoogleID.priceInAed}
+                            value={GoogleID.priceAED}
                             onChange={(e) =>
                               setGoogleID({
                                 ...GoogleID,
-                                priceInAed: e.target.value,
+                                priceAED:Number( e.target.value),
                               })
                             }
                           />

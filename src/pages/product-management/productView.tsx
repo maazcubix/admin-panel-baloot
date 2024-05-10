@@ -17,6 +17,8 @@ import { InputText } from 'primereact/inputtext';
 import AuthLayout from '../AuthLayout';
 import { Link } from 'react-router-dom';
 import {getStore} from "../../../api/getStores"
+import { Dropdown } from 'primereact/dropdown';
+
 
 interface Product {
     _id: string;
@@ -31,28 +33,45 @@ interface Product {
     owned: boolean;
     __v: number;
   }
+
+
+
+
+
+
+  const coloumns = [
+    { name: 'Short Code', code: 'shortCode' },
+    { name: 'Name', code: 'name' },
+    { name: 'Price', code: 'price' },
+    { name: 'Item Type', code: 'itemType' },
+    { name: 'image', code: 'image' }
+];
+
+
+
+
 export default function DetailView() {
 
 
-    useEffect(()=>{
-        try {
-            getStore().then(res=>{
-                console.log(res.data);
-                
-                const response=(res.data.data);
-                setProducts(response)
 
-               
-            
-        })
+    useEffect(() => {
+        fetchData();
+    },
+     []);
+
+
+     
+
+    const fetchData = async (params:any) => {
+        try {
+            const res = await getStore(params);
+            const responseData = res.data.data;
+            setProducts(responseData);
+            setPage(res.data.page);
         } catch (error) {
             console.log(error);
-            
         }
-    },[])
-
-
-
+    };
     const emptyProduct: Product = {
         _id: "",
         image: "",
@@ -66,6 +85,8 @@ export default function DetailView() {
         owned: false,
         __v: 0,
       };
+    
+      const [sort, setSort] = useState(null);
 
     const [products, setProducts] = useState<Product[]>([]);
     const [productDialog, setProductDialog] = useState<boolean>(false);
@@ -77,9 +98,42 @@ export default function DetailView() {
     const [globalFilter, setGlobalFilter] = useState<string>('');
     const   toast = useRef<Toast>(null);
     const dt = useRef<DataTable<Product[]>>(null);
-
-    console.log(product);
+    const [page,setPage]=useState()
+    const [first, setFirst] = useState(0);
+    const [params,setParams]=useState({
+        search:globalFilter,
+        page:1
+    })
+    console.log(params);
     
+
+    useEffect(()=>{
+        fetchData(params)
+    },[params])
+    
+    
+      
+    const onPageChange = async (event) => {
+        try {
+            const nextPage = event.page + 1;
+            console.log(nextPage);
+            
+           setParams(prev=>({
+            ...prev,
+            page:nextPage
+           }))
+            setFirst(event.first)
+
+            
+            // Fetch products for the next page
+            // const response = await getStore(nextPage);
+            // const responseData = response.data.data;
+            // setProducts(responseData);
+            
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     const formatCurrency = (value: number) => {
         return value
@@ -202,7 +256,6 @@ export default function DetailView() {
 
         // @ts-ignore
         _product[name] = val;
-
         setProduct(_product);
     };
 
@@ -266,7 +319,13 @@ export default function DetailView() {
             <h4 className="m-0">Manage Products</h4>
             <IconField iconPosition="right">
                 <InputIcon className="pi pi-search" />
-                 <InputText type="search" placeholder="Search..." onInput={(e) => {const target = e.target as HTMLInputElement; setGlobalFilter(target.value);}}  />
+                 <InputText type="search" placeholder="Search..." onInput={(e) => {const target = e.target as HTMLInputElement; setGlobalFilter(target.value); setParams(prev=>
+                 ({
+                 ...prev,
+                 search :target.value
+                    
+                })
+                 )}}  />
             </IconField>
         </div>
     );
@@ -288,36 +347,58 @@ export default function DetailView() {
             <Button label="Yes" icon="pi pi-check" severity="danger" onClick={deleteSelectedProducts} />
         </React.Fragment>
     );
-    console.log(products);
-    
     return (
         <AuthLayout>
-        <div>
+  
             <Toast ref={toast} />
             <div className="card">
                 <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
-                <DataTable ref={dt} value={products} selection={selectedProducts} 
+
+                <div>
+        <div className="card w-50 mb-4 flex justify-content-center">
+            <label > Sort </label>
+            <Dropdown style={{border:"10rem"}}  value={sort} onChange={(e) => setSort(e.value)} options={coloumns} optionLabel="name" 
+                placeholder="Select a City" className="w-full md:w-14rem" />
+        </div>
+
+                <DataTable ref={dt}  value={products} selection={selectedProducts} 
                         onSelectionChange={(e) => {
                             if (Array.isArray(e.value)) {
                                 setSelectedProducts(e.value);
                             }
                         }}
+                        sortMode="multiple"
+  
+                        dataKey="_id" 
                         
-                        dataKey="_id"  paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
-                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products" globalFilter={globalFilter} header={header}
+                        lazy
+                        onSort={(e)=>console.log(e)
+                        }
+                        
+                        onPage={onPageChange}
+                        first={first}
+                        
+                        paginator
+                        totalRecords={page?.totalDocs}    rows={10}  rowsPerPageOptions={[5, 10, 25]}
+                        paginatorTemplate=" PrevPageLink PageLinks NextPageLink LastPageLink  RowsPerPageDropdown"
+                        currentPageReportTemplate="Showing {totalRecords} products" globalFilter={globalFilter} header={header}
                         selectionMode="multiple"
+                        // onSort={(e)=>{}}
+                        
                 >
-                    <Column selectionMode="multiple" exportable={false}></Column>
-                    <Column field="shortCode" header="ShortCode" sortable style={{ minWidth: '12rem' }}></Column>
+                    <Column    selectionMode="multiple" exportable={false}></Column>
+                    <Column  field="shortCode" header="ShortCode"  style={{ minWidth: '12rem' }}></Column>
                     <Column field="name" header="Name" sortable style={{ minWidth: '16rem' }}></Column>
                     <Column field="image" header="Image" body={imageBodyTemplate}></Column>
-                    <Column field="price" header="Price" body={priceBodyTemplate} sortable style={{ minWidth: '8rem' }}></Column>
-                    <Column field="itemType" header="Category" sortable style={{ minWidth: '10rem' }}></Column>
+                    <Column  field="price" header="Price" body={priceBodyTemplate} sortable style={{ minWidth: '8rem' }}></Column>
+                    <Column field="itemType" header="itemType" sortable style={{ minWidth: '10rem' }}></Column>
                  
                     <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '12rem' }}></Column>
                 </DataTable>
+                <div className="card">
+            {/* <Paginator first={first}  rows={10} totalRecords={page?.totalDocs} onPageChange={onPageChange} template={{ layout: 'PrevPageLink CurrentPageReport NextPageLink' }} /> */}
+        </div>
             </div>
 
             <Dialog visible={productDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Product Details" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
