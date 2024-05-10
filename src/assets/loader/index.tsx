@@ -1,21 +1,20 @@
-import "./style.css"
-
-
+import "./style.css";
 
 const Loader = () => {
   return (
-<div className="spinner">
-  <div></div>   
-  <div></div>    
-  <div></div>    
-  <div></div>    
-  <div></div>    
-  <div></div>    
-  <div></div>    
-  <div></div>    
-  <div></div>    
-  <div></div>    
-</div>  )
-}
+    <div className="spinner">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  );
+};
 
-export default Loader
+export default Loader;

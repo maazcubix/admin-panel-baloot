@@ -8,21 +8,21 @@ import { createStore } from "../../../api/createStore";
 import Loader from "../../assets/loader";
 import { Toast } from "primereact/toast";
 const item = [
-    { name: "Vip Table", code: "VipTable" },
-    { name: "Tokens", code: "Tokens" },
-    { name: "Emojis", code: "Emojis" },
-    { name: "Cards", code: "Cards" },
-    { name: "Premium Pass", code: "PremiumPass" },
-  ];
+  { name: "Vip Table", code: "VipTable" },
+  { name: "Tokens", code: "Tokens" },
+  { name: "Emojis", code: "Emojis" },
+  { name: "Cards", code: "Cards" },
+  { name: "Premium Pass", code: "PremiumPass" },
+];
 
-  const card = [
-    { name: "Special Decks", code: "SpecialDecks" },
-    { name: "Card Backs", code: "CardBacks" },
-  ];
+const card = [
+  { name: "Special Decks", code: "SpecialDecks" },
+  { name: "Card Backs", code: "CardBacks" },
+];
 
 const DetailView = () => {
-    const toast = useRef(null);
-    const navigate=useNavigate();
+  const toast = useRef(null);
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
   const [itemType, selectItemType] = useState("");
@@ -30,8 +30,7 @@ const DetailView = () => {
   const [file, setFile] = useState<File | null>(null);
   const [image, setImage] = useState("");
   const [name, setName] = useState("");
-  
-  
+
   const [GoogleID, setGoogleID] = useState({
     id: "",
     priceAED: Number(""),
@@ -40,19 +39,26 @@ const DetailView = () => {
     id: "",
     priceAED: Number(""),
   });
-  
 
   const [price, setPrice] = useState<number | null>(0);
   const [shortCode, setShortCode] = useState("");
 
-
- 
   const showSuccess = () => {
-    toast.current.show({severity:'success', summary: 'Success', detail:'Item Created successfully', life: 3000});
-}
-const showError = (message) => {
-    toast.current.show({severity:'error', summary: 'Error', detail:`${message}`, life: 3000});
-}
+    toast.current.show({
+      severity: "success",
+      summary: "Success",
+      detail: "Item Created successfully",
+      life: 3000,
+    });
+  };
+  const showError = (message) => {
+    toast.current.show({
+      severity: "error",
+      summary: "Error",
+      detail: `${message}`,
+      life: 3000,
+    });
+  };
 
   function CustomUploadDemo() {
     const customBase64Uploader = async (event: any) => {
@@ -63,11 +69,9 @@ const showError = (message) => {
       let blob = await fetch(file.objectURL).then((r) => r.blob()); //blob:url
 
       reader.readAsDataURL(blob);
-      
 
       reader.onloadend = function () {
         const base64data = reader.result;
-        
       };
 
       setImage(URL.createObjectURL(blob));
@@ -76,16 +80,14 @@ const showError = (message) => {
     return (
       <div className="card flex justify-content-center">
         <FileUpload
-        className="mt-10"
-        chooseLabel='upload the product image'
+          className="mt-10"
+          chooseLabel="upload the product image"
           mode="basic"
           name="demo[]"
           url="/api/upload"
           accept="image/*"
           auto
-          
           customUpload
-          
           uploadHandler={customBase64Uploader}
         />
       </div>
@@ -93,13 +95,11 @@ const showError = (message) => {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); 
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
 
     try {
-        
       if (file) {
-
         const form = new FormData();
         form.append("file", file);
         const response = await uploadImage(form);
@@ -114,45 +114,46 @@ const showError = (message) => {
             ? { tokensReward: Number(price) }
             : { priceInTokens: Number(price) }),
           cardType: cardType?.code,
-          appleId:(itemType.code === "PremiumPass" || itemType.code === "Tokens") ? AppleID : null,
-          googleId: (itemType.code === "PremiumPass" || itemType.code === "Tokens") ? GoogleID : null
+          appleId:
+            itemType.code === "PremiumPass" || itemType.code === "Tokens"
+              ? AppleID
+              : null,
+          googleId:
+            itemType.code === "PremiumPass" || itemType.code === "Tokens"
+              ? GoogleID
+              : null,
         };
         const storeResponse = await createStore(payload);
         setLoading(false);
         showSuccess();
         // navigate("/product-management")
-      }
-      else {
-        setLoading(false)
-        showError("need image")
-        
+      } else {
+        setLoading(false);
+        showError("need image");
       }
     } catch (error) {
       console.log(error);
-      
-      if(error.response.data.msg){
-      showError(error.response.data.msg)
-      setLoading(false)
-}
-else{
-  showError(error.response.errors[0]);
-  setLoading(false)
 
-}
+      if (error.response.data.msg) {
+        showError(error.response.data.msg);
+        setLoading(false);
+      } else {
+        showError(error.response.errors[0]);
+        setLoading(false);
+      }
     }
   };
 
   return (
     <AuthLayout>
-        {
-            loading &&
-      <div className="h-1/2  w-2/3  absolute z-2 flex justify-center items-center">
-        <Loader />
-      </div>
-}
+      {loading && (
+        <div className="h-1/2  w-2/3  absolute z-2 flex justify-center items-center">
+          <Loader />
+        </div>
+      )}
 
       <div className="d-flex opacity justify-content-between align-items-center flex-wrap grid-margin">
-      <Toast ref={toast} />
+        <Toast ref={toast} />
 
         <div>
           <h4 className="mb-3 mb-md-0">Product </h4>
@@ -163,201 +164,198 @@ else{
           </Link>
         </div>
       </div>
-      <form   onSubmit={handleSubmit}>
-      <div className="datatable-doc-demo   ">
- 
-        <div className="card">
-          <div className="container rounded bg-white mt-5 mb-5">
-            <div className="row">
-              <div className="col-md-3 border-right">
-                <div className="d-flex flex-column align-items-center text-center p-3 py-5">
-                  {image ? (
-                    <img
-                      className="rounded-circle mt-5"
-                      width="150px"
-                      src={image}
-                    />
-                  ) : (
-                    <>
-                           <CustomUploadDemo />
-                           </>
-                  )}
+      <form onSubmit={handleSubmit}>
+        <div className="datatable-doc-demo   ">
+          <div className="card">
+            <div className="container rounded bg-white mt-5 mb-5">
+              <div className="row">
+                <div className="col-md-3 border-right">
+                  <div className="d-flex flex-column align-items-center text-center p-3 py-5">
+                    {image ? (
+                      <img
+                        className="rounded-circle mt-5"
+                        width="150px"
+                        src={image}
+                      />
+                    ) : (
+                      <>
+                        <CustomUploadDemo />
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="col-md-9 border-right">
-                <div className="p-3 py-5">
-                  <div className="row mt-2">
-                    <div className="col-md-6">
-                      <p>Select Type</p>
-                      <Dropdown
-                        value={itemType}
-                        onChange={(e) => selectItemType(e.value)}
-                        options={item}
-                        optionLabel="name"
-                        placeholder="Select a Item "
-                        className="w-full md:w-14rem"
-                        checkmark={true}
-                        highlightOnSelect={false}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="labels">
-                        <strong> Name</strong>
-                      </label>
-                      <input
-                        
-                        type="text"
-                        required
-                        className="form-control caption_input"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Name of the Item"
-                      />
-                    </div>
-                  </div>
-                  {}{" "}
-                  <div className="row mt-3">
-                    {!(itemType?.code === "PremiumPass") && (
+                <div className="col-md-9 border-right">
+                  <div className="p-3 py-5">
+                    <div className="row mt-2">
                       <div className="col-md-6">
-                        <label className="labels">
-                          <strong>
-                            {itemType?.code === "Tokens"
-                              ? "Tokens Reward"
-                              : "Price"}{" "}
-                          </strong>
-                        </label>
-                        <input
-                          required
-                          type="number"
-                          className="form-control caption_input"
-                          placeholder="enter address line 1"
-                          value={price}
-                          onChange={(e) => setPrice(e.target.value)}
-                        />
-                      </div>
-                    )}
-                    <div className="col-md-6">
-                      <label className="labels">
-                        <strong>ShortCode </strong>
-                      </label>
-                      <input
-                      required
-                        type="text"
-                        className="form-control caption_input"
-                        placeholder="Joining Date"
-                        value={shortCode}
-                        onChange={(e) => setShortCode(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  {itemType?.code &&
-                    ["Tokens", "PremiumPass"].includes(itemType.code) && (
-                      <div className="row mt-3">
-                        <div className="col-md-6">
-                          <label className="labels">
-                            <strong>Apple Id </strong>
-                          </label>
-                          <input
-                          required
-                            type="text"
-                            className="form-control caption_input"
-                            placeholder="enter address line 1"
-                            value={AppleID.id}
-                            onChange={(e) =>
-                              setAppleID({
-                                ...AppleID,
-                                id: e.target.value,
-                              })
-                            }
-                          />
-
-                          <label className="labels mt-2">
-                            <strong>Price in Aed Apple </strong>
-                          </label>
-                          <input
-                          required
-                            type="number"
-                            className="form-control caption_input"
-                            placeholder="enter address line 1"
-                            value={AppleID.priceAED}
-                            onChange={(e) =>
-                              setAppleID({
-                                ...AppleID,
-                                priceAED: Number(e.target.value),
-                              })
-                            }
-                          />
-                        </div>
-                        <div className="col-md-6">
-                          <label className="labels">
-                            <strong>GoogleID </strong>
-                          </label>
-
-                          <input
-                            required
-                            type="number"
-                            className="form-control caption_input"
-                            placeholder="Joining Date"
-                            value={GoogleID.id}
-                            onChange={(e) =>
-                              setGoogleID({
-                                ...GoogleID,
-                                id: e.target.value,
-                              })
-                            }
-                          />
-
-                          <label className="labels mt-2">
-                            <strong>Price in Aed For Google </strong>
-                          </label>
-                          <input
-                          required
-                            type="text"
-                            className="form-control caption_input"
-                            placeholder="Joining Date"
-                            value={GoogleID.priceAED}
-                            onChange={(e) =>
-                              setGoogleID({
-                                ...GoogleID,
-                                priceAED:Number( e.target.value),
-                              })
-                            }
-                          />
-                        </div>
-                      </div>
-                    )}
-                  {itemType?.code === "Cards" && (
-                    <div className="row mt-4">
-                      <div className="col-md-6">
+                        <p>Select Type</p>
                         <Dropdown
-                          value={cardType}
-                          onChange={(e) => setCardType(e.value)}
-                          options={card}
+                          value={itemType}
+                          onChange={(e) => selectItemType(e.value)}
+                          options={item}
                           optionLabel="name"
-                          placeholder="Select a Card Type"
+                          placeholder="Select a Item "
                           className="w-full md:w-14rem"
-                          defaultValue={card[0].name}
                           checkmark={true}
                           highlightOnSelect={false}
                         />
                       </div>
+                      <div className="col-md-6">
+                        <label className="labels">
+                          <strong> Name</strong>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          className="form-control caption_input"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          placeholder="Name of the Item"
+                        />
+                      </div>
                     </div>
-                  )}
+                    {}{" "}
+                    <div className="row mt-3">
+                      {!(itemType?.code === "PremiumPass") && (
+                        <div className="col-md-6">
+                          <label className="labels">
+                            <strong>
+                              {itemType?.code === "Tokens"
+                                ? "Tokens Reward"
+                                : "Price"}{" "}
+                            </strong>
+                          </label>
+                          <input
+                            required
+                            type="number"
+                            className="form-control caption_input"
+                            placeholder="enter address line 1"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                          />
+                        </div>
+                      )}
+                      <div className="col-md-6">
+                        <label className="labels">
+                          <strong>ShortCode </strong>
+                        </label>
+                        <input
+                          required
+                          type="text"
+                          className="form-control caption_input"
+                          placeholder="Joining Date"
+                          value={shortCode}
+                          onChange={(e) => setShortCode(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    {itemType?.code &&
+                      ["Tokens", "PremiumPass"].includes(itemType.code) && (
+                        <div className="row mt-3">
+                          <div className="col-md-6">
+                            <label className="labels">
+                              <strong>Apple Id </strong>
+                            </label>
+                            <input
+                              required
+                              type="text"
+                              className="form-control caption_input"
+                              placeholder="enter address line 1"
+                              value={AppleID.id}
+                              onChange={(e) =>
+                                setAppleID({
+                                  ...AppleID,
+                                  id: e.target.value,
+                                })
+                              }
+                            />
+
+                            <label className="labels mt-2">
+                              <strong>Price in Aed Apple </strong>
+                            </label>
+                            <input
+                              required
+                              type="number"
+                              className="form-control caption_input"
+                              placeholder="enter address line 1"
+                              value={AppleID.priceAED}
+                              onChange={(e) =>
+                                setAppleID({
+                                  ...AppleID,
+                                  priceAED: Number(e.target.value),
+                                })
+                              }
+                            />
+                          </div>
+                          <div className="col-md-6">
+                            <label className="labels">
+                              <strong>GoogleID </strong>
+                            </label>
+
+                            <input
+                              required
+                              type="number"
+                              className="form-control caption_input"
+                              placeholder="Joining Date"
+                              value={GoogleID.id}
+                              onChange={(e) =>
+                                setGoogleID({
+                                  ...GoogleID,
+                                  id: e.target.value,
+                                })
+                              }
+                            />
+
+                            <label className="labels mt-2">
+                              <strong>Price in Aed For Google </strong>
+                            </label>
+                            <input
+                              required
+                              type="text"
+                              className="form-control caption_input"
+                              placeholder="Joining Date"
+                              value={GoogleID.priceAED}
+                              onChange={(e) =>
+                                setGoogleID({
+                                  ...GoogleID,
+                                  priceAED: Number(e.target.value),
+                                })
+                              }
+                            />
+                          </div>
+                        </div>
+                      )}
+                    {itemType?.code === "Cards" && (
+                      <div className="row mt-4">
+                        <div className="col-md-6">
+                          <Dropdown
+                            value={cardType}
+                            onChange={(e) => setCardType(e.value)}
+                            options={card}
+                            optionLabel="name"
+                            placeholder="Select a Card Type"
+                            className="w-full md:w-14rem"
+                            defaultValue={card[0].name}
+                            checkmark={true}
+                            highlightOnSelect={false}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <button
-              disabled={!file && !itemType}
-              className=" block mx-auto btn-success p-3 rounded-md"
-              type="submit"
-            
-            >
-              Submit
-            </button>
+              <button
+                disabled={!file && !itemType}
+                className=" block mx-auto btn-success p-3 rounded-md"
+                type="submit"
+              >
+                Submit
+              </button>
+            </div>
           </div>
         </div>
-      </div>
       </form>
     </AuthLayout>
   );
