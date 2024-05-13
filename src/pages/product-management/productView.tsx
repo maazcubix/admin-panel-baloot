@@ -92,7 +92,6 @@ export default function DetailView() {
     search: globalFilter,
     page: 1,
   });
-  console.log("params-->",params);
   
   const [lazyState, setLazyState] = useState({
     first: 0,
@@ -102,7 +101,7 @@ export default function DetailView() {
     search:globalFilter
   });
 
-  console.log(lazyState);
+
 
   useEffect(() => {
     fetchData(lazyState);
@@ -434,7 +433,7 @@ export default function DetailView() {
 
   const onSort = (event) => {
     const { multiSortMeta } = lazyState;
-    console.log(event);
+
 
     const { multiSortMeta: newMultiSortMeta } = event;
     const updatedMultiSortMeta = [...multiSortMeta];
@@ -457,7 +456,6 @@ export default function DetailView() {
   };
 
   const onPage = (event) => {
-    console.log("event---->", event);
     setLazyState(event);
   };
 
