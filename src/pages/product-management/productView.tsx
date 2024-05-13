@@ -92,31 +92,41 @@ export default function DetailView() {
     search: globalFilter,
     page: 1,
   });
-  console.log(params);
+  console.log("params-->",params);
+  
+  const [lazyState, setLazyState] = useState({
+    first: 0,
+    rows: 10,
+    page: 1,
+    multiSortMeta: [],
+    search:globalFilter
+  });
+
+  console.log(lazyState);
 
   useEffect(() => {
-    fetchData(params);
-  }, [params]);
+    fetchData(lazyState);
+  }, [lazyState]);
 
-  const onPageChange = async (event) => {
-    try {
-      const nextPage = event.page + 1;
-      console.log(nextPage);
+  // const onPageChange = async (event) => {
+  //   try {
+  //     const nextPage = event.page + 1;
+  //     console.log(nextPage);
 
-      setParams((prev) => ({
-        ...prev,
-        page: nextPage,
-      }));
-      setFirst(event.first);
+  //     setParams((prev) => ({
+  //       ...prev,
+  //       page: nextPage,
+  //     }));
+  //     setFirst(event.first);
 
-      // Fetch products for the next page
-      // const response = await getStore(nextPage);
-      // const responseData = response.data.data;
-      // setProducts(responseData);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //     // Fetch products for the next page
+  //     // const response = await getStore(nextPage);
+  //     // const responseData = response.data.data;
+  //     // setProducts(responseData);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const formatCurrency = (value: number) => {
     return value;
@@ -367,7 +377,7 @@ export default function DetailView() {
           onInput={(e) => {
             const target = e.target as HTMLInputElement;
             setGlobalFilter(target.value);
-            setParams((prev) => ({
+            setLazyState((prev) => ({
               ...prev,
               search: target.value,
             }));
@@ -421,6 +431,36 @@ export default function DetailView() {
       />
     </React.Fragment>
   );
+
+  const onSort = (event) => {
+    const { multiSortMeta } = lazyState;
+    console.log(event);
+
+    const { multiSortMeta: newMultiSortMeta } = event;
+    const updatedMultiSortMeta = [...multiSortMeta];
+    newMultiSortMeta.forEach((sortMeta) => {
+      const existingMetaIndex = updatedMultiSortMeta.findIndex(
+        (meta) => meta.field === sortMeta.field
+      );
+      if (existingMetaIndex !== -1) {
+        const existingMeta = updatedMultiSortMeta[existingMetaIndex];
+        if (existingMeta.order === 1) {
+          existingMeta.order = -1; // Change to descending order
+        } else if (existingMeta.order === -1) {
+          updatedMultiSortMeta.splice(existingMetaIndex, 1); // Remove sort meta for unsorting
+        }
+      } else {
+        updatedMultiSortMeta.push(sortMeta); // Add new sort meta
+      }
+    });
+    setLazyState({ ...lazyState, multiSortMeta: updatedMultiSortMeta });
+  };
+
+  const onPage = (event) => {
+    console.log("event---->", event);
+    setLazyState(event);
+  };
+
   return (
     <AuthLayout>
       <Toast ref={toast} />
@@ -446,32 +486,27 @@ export default function DetailView() {
           </div>
 
           <DataTable
-            ref={dt}
             value={products}
-            selection={selectedProducts}
-            onSelectionChange={(e) => {
-              if (Array.isArray(e.value)) {
-                setSelectedProducts(e.value);
-              }
-            }}
-            sortMode="multiple"
-            dataKey="_id"
             lazy
-            onSort={(e) => console.log(e)}
-            onPage={onPageChange}
-            first={first}
+            dataKey="_id"
             paginator
-            totalRecords={page?.totalDocs}
+            first={lazyState.first}
             rows={10}
+            totalRecords={page?.totalDocs}
+            onPage={onPage}
+            // sortMode="multiple"
+            sortMode="multiple"
+            onSort={onSort}
+            multiSortMeta={lazyState.multiSortMeta}
+            // sortField={lazyState.sortField }
+            // sortOrder={lazyState.sortOrder}
+
             rowsPerPageOptions={[5, 10, 25]}
             paginatorTemplate=" PrevPageLink PageLinks NextPageLink LastPageLink  RowsPerPageDropdown"
             currentPageReportTemplate="Showing {totalRecords} products"
-            globalFilter={globalFilter}
             header={header}
-            selectionMode="multiple"
-            // onSort={(e)=>{}}
           >
-            <Column selectionMode="multiple" exportable={false}></Column>
+            <Column exportable={false}></Column>
             <Column
               field="shortCode"
               header="ShortCode"
